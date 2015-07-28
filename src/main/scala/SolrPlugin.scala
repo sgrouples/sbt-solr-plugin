@@ -22,6 +22,8 @@ object SolrPlugin extends AutoPlugin {
 
     lazy val solrContext = settingKey[String]("http context, default solr")
 
+    lazy val solrVersion = settingKey[String]("Solr version to run, must be > than 5.0.0")
+
     //todo - make settings
     lazy val solrConfigHome = settingKey[File]("folder with solr configs to use")
   }
@@ -38,25 +40,28 @@ object SolrPlugin extends AutoPlugin {
     solrSettings(Solr)
 
   def solrSettings(conf: Configuration) = {
-    Seq(libraryDependencies ++= Seq(
-      "org.apache.solr" % "solr-solrj" % "5.2.1" % "solr",
-      "org.apache.solr" % "solr-core" % "5.2.1" % "solr",
-      "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
-      "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
-      "me.sgrouples" % "solr-starter" % "1.0.0" % "solr"
-    ),
-      jettySolrKey  := new AtomicReference(Option.empty[Process]),
+      Seq(jettySolrKey  := new AtomicReference(Option.empty[Process]),
       solrPort := 8983,
       solrRunFolder := target.value / "solr",
       solrContext := "/solr",
-      solrConfigHome := (resourceDirectory in Compile).value / "solr"
+      solrConfigHome := (resourceDirectory in Compile).value / "solr",
+      solrVersion := "5.2.1"
     ) ++
-    inConfig(conf)(Seq(
+    inConfig(conf){
+      Seq(
       solrStart := (startTask dependsOn (solrCollectJars, solrCopyConfig)).value,
       solrStop := stopTask.value,
       solrCollectJars := collectJars.value,
-      solrCopyConfig := copyConfig.value
-    ))
+      solrCopyConfig := copyConfig.value,
+      onLoad in Global   := onLoadSetting.value,
+      libraryDependencies ++= Seq(
+        "org.apache.solr" % "solr-solrj" % solrVersion.value % "solr",
+        "org.apache.solr" % "solr-core" % solrVersion.value % "solr",
+        "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
+        "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
+        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
+      )
+    )}
   }
 
   val forkOptions = new ForkOptions
@@ -70,10 +75,17 @@ object SolrPlugin extends AutoPlugin {
       file    = cpItem.data
       if !file.isDirectory
       name    = file.getName
-      if name.endsWith(".jar")
+      //if name.endsWith(".jar")
     } yield IO.copyFile(file, solrLibFolder / name)
     (solrLibFolder ** "*") pair (relativeTo(solrLibFolder) | flat)
   }
+
+  private def onLoadSetting: Def.Initialize[State => State] = Def.setting {
+    (onLoad in Global).value compose { state: State =>
+        state.addExitHook(shutdownSolr(jettySolrKey.value.get()))
+      }
+    }
+
 
   private def copyConfig = Def.task {
     val solrConfig = IO.copyDirectory( solrConfigHome.value , solrRunFolder.value, true )
@@ -89,7 +101,7 @@ object SolrPlugin extends AutoPlugin {
     val libs = collectJars.value.map(_._1)
     val cp = Path.makeString(libs)
     val args = Seq("me.sgrouples.SolrStarter", solrRunFolder.value.toString, solrPort.value.toString, solrContext.value)
-    val p = new Fork("java", None).fork(forkOptions, Seq("-cp", cp) ++ args)
+    val p = new Fork("java", None).fork(forkOptions, Seq("-Dorg.slf4j.simpleLogger.defaultLogLevel=WARN", "-cp", cp) ++ args)
     processStore.set(Some(p))
     p
   }

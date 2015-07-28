@@ -6,6 +6,6 @@ scalaVersion  := "2.10.5"
 
 sbtPlugin     := true
 
-version := "0.2"
+version := "0.4"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
