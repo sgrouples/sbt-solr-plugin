@@ -6,7 +6,7 @@ Allows to start solr from sbt in a separate jvm
 1. Add solr to *project/plugins.sbt*:
 
 ```scala
-addSbtPlugin("me.sgrouples" % "solr-plugin" % "0.4.0")
+addSbtPlugin("me.sgrouples" % "solr-plugin" % "0.4")
 ```
 
 also add repository to *project/plugins.sbt*:
