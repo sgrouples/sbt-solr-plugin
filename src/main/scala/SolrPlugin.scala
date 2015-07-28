@@ -22,8 +22,6 @@ object SolrPlugin extends AutoPlugin {
 
     lazy val solrContext = settingKey[String]("http context, default solr")
 
-    lazy val solrVersion = settingKey[String]("Solr version to run, must be > than 5.0.0")
-
     //todo - make settings
     lazy val solrConfigHome = settingKey[File]("folder with solr configs to use")
   }
@@ -39,13 +37,20 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
+  val solrVersion = "5.2.1"
   def solrSettings(conf: Configuration) = {
       Seq(jettySolrKey  := new AtomicReference(Option.empty[Process]),
       solrPort := 8983,
       solrRunFolder := target.value / "solr",
       solrContext := "/solr",
       solrConfigHome := (resourceDirectory in Compile).value / "solr",
-      solrVersion := "5.2.1"
+      libraryDependencies ++= Seq(
+          "org.apache.solr" % "solr-solrj" % solrVersion % "solr",
+          "org.apache.solr" % "solr-core" % solrVersion % "solr",
+          "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
+          "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
+          "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
+      )
     ) ++
     inConfig(conf){
       Seq(
@@ -53,14 +58,7 @@ object SolrPlugin extends AutoPlugin {
       solrStop := stopTask.value,
       solrCollectJars := collectJars.value,
       solrCopyConfig := copyConfig.value,
-      onLoad in Global   := onLoadSetting.value,
-      libraryDependencies ++= Seq(
-        "org.apache.solr" % "solr-solrj" % solrVersion.value % "solr",
-        "org.apache.solr" % "solr-core" % solrVersion.value % "solr",
-        "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
-        "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
-        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
-      )
+      onLoad in Global   := onLoadSetting.value
     )}
   }
 

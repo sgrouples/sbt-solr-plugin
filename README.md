@@ -45,6 +45,3 @@ solrStart
  
 `solrContext := /solr` http context
  
-`solrVersion: = "5.2.1"` solr version, must be 5.0.0 or newer
-
-
