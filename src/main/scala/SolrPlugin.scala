@@ -37,7 +37,7 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
-  val solrVersion = "5.5.1"
+  val solrVersion = "6.1.0"
   def solrSettings(conf: Configuration) = {
     Seq(
       jettySolrKey := new AtomicReference(Option.empty[Process]),
