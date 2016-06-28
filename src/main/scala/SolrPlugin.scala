@@ -39,27 +39,29 @@ object SolrPlugin extends AutoPlugin {
 
   val solrVersion = "5.5.1"
   def solrSettings(conf: Configuration) = {
-      Seq(jettySolrKey  := new AtomicReference(Option.empty[Process]),
+    Seq(
+      jettySolrKey := new AtomicReference(Option.empty[Process]),
       solrPort := 8983,
       solrRunFolder := target.value / "solr",
       solrContext := "/solr",
       solrConfigHome := (resourceDirectory in Compile).value / "solr",
       libraryDependencies ++= Seq(
-          "org.apache.solr" % "solr-solrj" % solrVersion % "solr",
-          "org.apache.solr" % "solr-core" % solrVersion % "solr",
-          "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
-          "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
-          "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
+        "org.apache.solr" % "solr-solrj" % solrVersion % "solr",
+        "org.apache.solr" % "solr-core" % solrVersion % "solr",
+        "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
+        "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
+        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
       )
     ) ++
-    inConfig(conf){
-      Seq(
-      solrStart := (startTask dependsOn (solrCollectJars, solrCopyConfig)).value,
-      solrStop := stopTask.value,
-      solrCollectJars := collectJars.value,
-      solrCopyConfig := copyConfig.value,
-      onLoad in Global   := onLoadSetting.value
-    )}
+      inConfig(conf) {
+        Seq(
+          solrStart := (startTask dependsOn (solrCollectJars, solrCopyConfig)).value,
+          solrStop := stopTask.value,
+          solrCollectJars := collectJars.value,
+          solrCopyConfig := copyConfig.value,
+          onLoad in Global := onLoadSetting.value
+        )
+      }
   }
 
   val forkOptions = new ForkOptions
@@ -70,9 +72,9 @@ object SolrPlugin extends AutoPlugin {
     val solrLibFolder = solrRunFolder.value / "lib"
     for {
       cpItem <- cpLibs
-      file    = cpItem.data
+      file = cpItem.data
       if !file.isDirectory
-      name    = file.getName
+      name = file.getName
       //if name.endsWith(".jar")
     } yield IO.copyFile(file, solrLibFolder / name)
     (solrLibFolder ** "*") pair (relativeTo(solrLibFolder) | flat)
@@ -80,13 +82,12 @@ object SolrPlugin extends AutoPlugin {
 
   private def onLoadSetting: Def.Initialize[State => State] = Def.setting {
     (onLoad in Global).value compose { state: State =>
-        state.addExitHook(shutdownSolr(jettySolrKey.value.get()))
-      }
+      state.addExitHook(shutdownSolr(jettySolrKey.value.get()))
     }
-
+  }
 
   private def copyConfig = Def.task {
-    val solrConfig = IO.copyDirectory( solrConfigHome.value , solrRunFolder.value, true )
+    val solrConfig = IO.copyDirectory(solrConfigHome.value, solrRunFolder.value, true)
   }
 
   private def shutdownSolr(p: Option[Process]) = p.map(_.destroy())
@@ -104,7 +105,7 @@ object SolrPlugin extends AutoPlugin {
     p
   }
 
-  private def stopTask: Def.Initialize[Task[Unit]]  = Def.task {
+  private def stopTask: Def.Initialize[Task[Unit]] = Def.task {
     val processStore = jettySolrKey.value
     shutdownSolr(processStore.get())
     processStore.set(None)

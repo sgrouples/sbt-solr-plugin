@@ -1,11 +1,8 @@
-organization := "me.sgrouples"
+import BuildSettings._
 
-name          := "solr-plugin"
+lazy val settings = BuildSettings.buildSettings ++
+  coreSettings ++
+  publishSettings ++
+  Seq(fork := true)
 
-scalaVersion  := "2.10.5"
-
-sbtPlugin     := true
-
-version := "0.5.0"
-
-scalacOptions ++= Seq("-feature", "-deprecation")
+lazy val sorlPlugin = (project in file(".")).settings(settings)
