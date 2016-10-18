@@ -37,7 +37,9 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
-  val solrVersion = "6.1.0"
+  val solrVersion = "6.2.1"
+  val slf4jVersion = "1.7.21"
+
   def solrSettings(conf: Configuration) = {
     Seq(
       jettySolrKey := new AtomicReference(Option.empty[Process]),
@@ -48,8 +50,8 @@ object SolrPlugin extends AutoPlugin {
       libraryDependencies ++= Seq(
         "org.apache.solr" % "solr-solrj" % solrVersion % "solr",
         "org.apache.solr" % "solr-core" % solrVersion % "solr",
-        "org.slf4j" % "jcl-over-slf4j" % "1.7.12" % "solr",
-        "org.slf4j" % "slf4j-simple" % "1.7.12" % "solr",
+        "org.slf4j" % "jcl-over-slf4j" % slf4jVersion % "solr",
+        "org.slf4j" % "slf4j-simple" % slf4jVersion % "solr",
         "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
       )
     ) ++
