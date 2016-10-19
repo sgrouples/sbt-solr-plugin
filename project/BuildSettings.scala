@@ -30,13 +30,7 @@ object BuildSettings {
     publishMavenStyle := true,
     publishArtifact in Test := false,
     pomIncludeRepository := Function.const(false),
-    publishTo <<= version { v =>
-      val nexus = "https://nexus.groupl.es/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("Snapshots" at nexus + "repository/maven-snapshots/")
-      else
-        Some("Releases" at nexus + "repository/maven-releases/")
-    },
+    publishTo := Some("Plugins" at  "https://nexus.groupl.es/repository/sbt-plugins/"),
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
