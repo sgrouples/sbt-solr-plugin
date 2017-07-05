@@ -52,7 +52,8 @@ object SolrPlugin extends AutoPlugin {
         "org.apache.solr" % "solr-core" % solrVersion % "solr",
         "org.slf4j" % "jcl-over-slf4j" % slf4jVersion % "solr",
         "org.slf4j" % "slf4j-simple" % slf4jVersion % "solr",
-        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
+        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr",
+        "org.eclipse.jetty" % "jetty-runner" % "9.4.6.v20170531" % "solr"
       )
     ) ++
       inConfig(conf) {
