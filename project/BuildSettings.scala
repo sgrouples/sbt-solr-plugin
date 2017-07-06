@@ -9,7 +9,7 @@ import ReleaseTransformations._
 object BuildSettings {
 
   val buildOrganization = "me.sgrouples"
-  val buildScalaVersion = "2.10.5"
+  val buildScalaVersion = "2.10.6"
   val buildName = "solr-plugin"
 
   val buildSettings = Defaults.coreDefaultSettings ++ Seq(
@@ -22,7 +22,7 @@ object BuildSettings {
 
 
   val coreSettings = Seq(
-    unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_))
+    unmanagedSourceDirectories in Compile := { (scalaSource in Compile)(Seq(_)).value }
   )
 
   val publishSettings = Seq(

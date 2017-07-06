@@ -24,6 +24,7 @@ object SolrPlugin extends AutoPlugin {
 
     //todo - make settings
     lazy val solrConfigHome = settingKey[File]("folder with solr configs to use")
+
   }
 
   import autoImport._
@@ -37,7 +38,7 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
-  val solrVersion = "6.2.1"
+  val solrVersion = "6.3.0"
   val slf4jVersion = "1.7.21"
 
   def solrSettings(conf: Configuration) = {
@@ -52,8 +53,7 @@ object SolrPlugin extends AutoPlugin {
         "org.apache.solr" % "solr-core" % solrVersion % "solr",
         "org.slf4j" % "jcl-over-slf4j" % slf4jVersion % "solr",
         "org.slf4j" % "slf4j-simple" % slf4jVersion % "solr",
-        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr",
-        "org.eclipse.jetty" % "jetty-runner" % "9.4.6.v20170531" % "solr"
+        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
       )
     ) ++
       inConfig(conf) {
@@ -97,13 +97,15 @@ object SolrPlugin extends AutoPlugin {
 
   private def startTask = Def.task {
     val processStore = jettySolrKey.value
+    val solrLogFolder = solrRunFolder.value / "log"
+    IO.createDirectory(solrLogFolder)
     shutdownSolr(processStore.get())
     processStore.set(None)
     val conf = configuration.value
     val libs = collectJars.value.map(_._1)
     val cp = Path.makeString(libs)
     val args = Seq("me.sgrouples.SolrStarter", solrRunFolder.value.toString, solrPort.value.toString, solrContext.value)
-    val p = new Fork("java", None).fork(forkOptions, Seq("-Dorg.slf4j.simpleLogger.defaultLogLevel=WARN", "-cp", cp) ++ args)
+    val p = new Fork("java", None).fork(forkOptions, Seq("-Dorg.slf4j.simpleLogger.defaultLogLevel=WARN", s"-Dsolr.log.dir=${solrLogFolder}", "-cp", cp) ++ args)
     processStore.set(Some(p))
     p
   }
