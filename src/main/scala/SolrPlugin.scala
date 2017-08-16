@@ -3,6 +3,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 import sbt._
 import Keys._
+import sbt.io.IO
+import sbt.io.Path._
+import scala.sys.process.Process
 object SolrPlugin extends AutoPlugin {
 
   private lazy val jettySolrKey = settingKey[AtomicReference[Option[Process]]]("solr process")
@@ -53,21 +56,18 @@ object SolrPlugin extends AutoPlugin {
         "org.apache.solr" % "solr-core" % solrVersion % "solr",
         "org.slf4j" % "jcl-over-slf4j" % slf4jVersion % "solr",
         "org.slf4j" % "slf4j-simple" % slf4jVersion % "solr",
-        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr"
-      )
-    ) ++
+        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr")) ++
       inConfig(conf) {
         Seq(
           solrStart := (startTask dependsOn (solrCollectJars, solrCopyConfig)).value,
           solrStop := stopTask.value,
           solrCollectJars := collectJars.value,
           solrCopyConfig := copyConfig.value,
-          onLoad in Global := onLoadSetting.value
-        )
+          onLoad in Global := onLoadSetting.value)
       }
   }
 
-  val forkOptions = new ForkOptions
+  val forkOptions = ForkOptions()
 
   private def collectJars = Def.task {
     val conf = configuration.value

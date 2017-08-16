@@ -6,10 +6,8 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0" excludeAll(ExclusionRule(organization = "com.danieltrinh")))
+addSbtPlugin("com.github.gseitz" %% "sbt-release" % "1.0.6")
 
-addSbtPlugin("com.github.gseitz" %% "sbt-release" % "1.0.3")
-
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.0")
 
 libraryDependencies += "org.scala-sbt" % "scripted-plugin" % sbtVersion.value
