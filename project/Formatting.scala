@@ -1,6 +1,8 @@
 import sbt._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import com.typesafe.sbt.SbtScalariform._
+import scalariform.formatter.preferences._
 
 object Formatting {
   lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
