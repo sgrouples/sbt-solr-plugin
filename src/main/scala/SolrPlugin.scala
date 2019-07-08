@@ -41,7 +41,8 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
-  val solrVersion = "7.3.0"
+  val solrVersion = "7.7.2"
+  val solrStarterVerion = "1.1.0"
   val slf4jVersion = "1.7.21"
 
   def solrSettings(conf: Configuration) = {
@@ -56,7 +57,7 @@ object SolrPlugin extends AutoPlugin {
         "org.apache.solr" % "solr-core" % solrVersion % "solr",
         "org.slf4j" % "jcl-over-slf4j" % slf4jVersion % "solr",
         "org.slf4j" % "slf4j-simple" % slf4jVersion % "solr",
-        "me.sgrouples" % "solr-starter" % "1.0.2" % "solr")) ++
+        "me.sgrouples" % "solr-starter" % solrStarterVerion % "solr")) ++
       inConfig(conf) {
         Seq(
           solrStart := (startTask dependsOn (solrCollectJars, solrCopyConfig)).value,
