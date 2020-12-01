@@ -41,8 +41,8 @@ object SolrPlugin extends AutoPlugin {
   override lazy val projectSettings: scala.Seq[sbt.Def.Setting[_]] =
     solrSettings(Solr)
 
-  val solrVersion = "7.7.2"
-  val solrStarterVerion = "1.1.0"
+  val solrVersion = "8.6.2"
+  val solrStarterVerion = "2.0.0"
   val slf4jVersion = "1.7.21"
 
   def solrSettings(conf: Configuration) = {
